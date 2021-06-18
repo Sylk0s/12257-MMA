@@ -4,4 +4,5 @@ Project for MAA question 12257 to find pairs of Heron Triangles from the file tr
 Will be modified later to apply more constraints.
 Currently generates a decently long list...
 
+Data from:
 http://cis.csuohio.edu/~somos/tritab.txt
