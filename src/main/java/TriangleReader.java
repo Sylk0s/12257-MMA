@@ -42,15 +42,47 @@ public class TriangleReader {
             }
 
             HashMap<Integer, Triangle> perimeters = new HashMap<>();
+            HashMap<Integer, List<Triangle>> perimeterresults  = new HashMap<>();
+            HashMap<Integer, List<Triangle>> arearesults = new HashMap<>();
 
             for(Triangle triangle : triangles) {
-                int perimeter = triangle.a1 + triangle.a2 + triangle.a3;
+                int perimeter = triangle.P;
                 if(!perimeters.containsKey(perimeter)) {
                     perimeters.put(perimeter, triangle);
                 } else {
-                    System.out.println(perimeters.get(perimeter).n + " and " + triangle.n);
+                    if(!perimeterresults.containsKey(perimeter)) {
+                        List<Triangle> list = new ArrayList<>();
+                        list.add(triangle);
+                        perimeterresults.put(perimeter, list);
+                    }  else {
+                        perimeterresults.get(perimeter).add(triangle);
+                    }
                 }
             }
+
+            System.out.println(perimeterresults.size());
+
+            perimeterresults.forEach((k,v) -> {
+                int peri = k;
+                int sp = peri / 2;
+                v.forEach(r1 -> {
+                    int area = r1.D;
+                    v.forEach(r -> {
+                        if((r.D == area) && !r.equals(r1)) {
+                            arearesults.put(peri, v);
+                        }
+                    });
+                });
+            });
+
+            System.out.println(arearesults.size());
+
+            arearesults.forEach((p, a) -> {
+                System.out.println("With area: " + a.get(0).D);
+                System.out.println("With perimeter: " + a.get(0).P);
+                a.forEach(t -> {
+                  System.out.println(t.a1 + ", " + t.a2 + ", " + t.a3);
+                }); });
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
