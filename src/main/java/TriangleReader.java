@@ -60,29 +60,51 @@ public class TriangleReader {
                 }
             }
 
-            System.out.println(perimeterresults.size());
-
             perimeterresults.forEach((k,v) -> {
                 int peri = k;
                 int sp = peri / 2;
+                List<Triangle> samearea = new ArrayList<>();
                 v.forEach(r1 -> {
                     int area = r1.D;
                     v.forEach(r -> {
                         if((r.D == area) && !r.equals(r1)) {
-                            arearesults.put(peri, v);
+                            samearea.add(r);
                         }
                     });
                 });
+                if(samearea.size() != 0)
+                    arearesults.put(peri, samearea);
             });
 
             System.out.println(arearesults.size());
 
+            File file = new File("output.txt");
+            file.createNewFile();
+            FileWriter writer = new FileWriter(file.getPath());
+
             arearesults.forEach((p, a) -> {
-                System.out.println("With area: " + a.get(0).D);
-                System.out.println("With perimeter: " + a.get(0).P);
-                a.forEach(t -> {
-                  System.out.println(t.a1 + ", " + t.a2 + ", " + t.a3);
-                }); });
+                try {
+                    writer.write("With area: " + a.get(0).D + "\n");
+                    writer.write("With perimeter: " + a.get(0).P + "\n");
+                    a.forEach(t -> {
+                        try {
+                            writer.write(t.a1 + ", " + t.a2 + ", " + t.a3 + "\n");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    writer.write(" \n");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                //System.out.println("With area: " + a.get(0).D);
+                //System.out.println("With perimeter: " + a.get(0).P);
+                //a.forEach(t -> {
+                //System.out.println(t.a1 + ", " + t.a2 + ", " + t.a3);
+                //});
+            });
+
+            writer.close();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
