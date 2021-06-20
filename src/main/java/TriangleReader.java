@@ -5,6 +5,8 @@ import java.util.List;
 
 public class TriangleReader {
 
+    public static boolean found = false;
+
     public static void main(String[] args) throws IOException {
 
         List<Triangle> triangles = new ArrayList<>();
@@ -43,7 +45,7 @@ public class TriangleReader {
 
             HashMap<Integer, Triangle> perimeters = new HashMap<>();
             HashMap<Integer, List<Triangle>> perimeterresults  = new HashMap<>();
-            HashMap<Integer, List<Triangle>> arearesults = new HashMap<>();
+            HashMap<Integer, List<Triangle>> arearesults = new HashMap<>(); //idk why im using hashmaps here... probably not a smart move
             List<List<Triangle>> finalresults = new ArrayList<>();
 
             for(Triangle triangle : triangles) {
@@ -78,20 +80,27 @@ public class TriangleReader {
             });
 
             arearesults.forEach((a,t) -> {
-                Triangle ref = t.get(0);
-                    for(Triangle triangle : getPermutations(ref)) {
-                        float t1Cos = (float) ((Math.pow(triangle.a3, 2) - Math.pow(triangle.a1, 2) - Math.pow(triangle.a2, 2)) / (-2 * triangle.a1 * triangle.a2));
-                        for(int index = 1; index < t.size(); index++) {
-                            Triangle triangle2 = t.get(index);
-                            float t2Cos = (float) ((Math.pow(triangle2.a3, 2) - Math.pow(triangle2.a1, 2) - Math.pow(triangle2.a2, 2)) / (-2 * triangle2.a1 * triangle2.a2));
-                            if(roughlyEqualsNegative(t1Cos, t2Cos)) {
-                                List<Triangle> result = new ArrayList<>();
-                                result.add(triangle);
-                                result.add(triangle2);
-                                finalresults.add(result);
+                t.forEach(t1 -> {
+                    for(Triangle triangle : TriangleReader.getPermutations(t1)) {
+                        float t1Cos = evaluateCosInt(triangle);
+                        t.forEach(t2 -> {
+                            if(!t2.equals(t1)) {
+                                for (Triangle triangle2 : TriangleReader.getPermutations(t2)) {
+                                    float t2Cos = evaluateCosInt(triangle2);
+                                    if (isFound(TriangleReader.roughlyEqualsNegative(t1Cos, t2Cos))) {
+                                            List<Triangle> pair = new ArrayList<>();
+                                            pair.add(triangle);
+                                            pair.add(triangle2);
+                                            finalresults.add(pair);
+                                        break;
+                                    }
+                                }
                             }
-                        }
+                        });
+                        if(found)
+                            break;
                     }
+                });
             });
 
             File file = new File("output.txt");
@@ -114,27 +123,6 @@ public class TriangleReader {
                 }
             });
             writer.close();
-
-            /*
-            arearesults.forEach((p, a) -> {
-                try {
-                    writer.write("With area: " + a.get(0).D + "\n");
-                    writer.write("With perimeter: " + a.get(0).P + "\n");
-                    a.forEach(t -> {
-                        try {
-                            writer.write(t.a1 + ", " + t.a2 + ", " + t.a3 + "\n");
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    });
-                    writer.write(" \n");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-
-            writer.close();
-            */
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -170,10 +158,19 @@ public class TriangleReader {
         return new Triangle[]{t1, t2, t3, t4, t5, t6};
     }
 
-    public static final float ERROR_AMOUNT = 0.1f;
+    public static final float ERROR_AMOUNT = 0.001f;
 
     public static boolean roughlyEqualsNegative(float num, float num2) {
-        if(Math.abs(num - num2) < ERROR_AMOUNT) return true;
+        if(Math.abs(num + num2) < ERROR_AMOUNT) return true;
         else return false;
+    }
+
+    public static float evaluateCosInt(Triangle triangle) {
+        return (float) ((Math.pow(triangle.a3, 2) - Math.pow(triangle.a1, 2) - Math.pow(triangle.a2, 2)) / (-2 * triangle.a1 * triangle.a2));
+    }
+
+    public static boolean isFound(boolean found1) {
+        found = found1;
+        return found1;
     }
 }
